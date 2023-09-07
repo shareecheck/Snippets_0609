@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from MainApp.models import Snippet
 from django.core.exceptions import ObjectDoesNotExist
 from MainApp.forms import SnippetForm
+from django.contrib import auth
 
 def index_page(request):
     context = {'pagename': 'PythonBin'}
@@ -35,7 +36,7 @@ def delete_snippet(request, snippet_id):
         snippet.delete()
         return redirect("list")
     
-    
+
 def edit_snippet(request, snippet_id):
     try:
         snippet = Snippet.objects.get(id=snippet_id)
@@ -78,6 +79,22 @@ def snippet_info_page(request, snippet_id):
     except ObjectDoesNotExist:
         return HttpResponseNotFound(f'Сниппет не найден')
 
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = auth.authenticate(request, username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+        else:
+            # Return error message
+            pass
+        return redirect('index')
+
+
+def logout(request):
+    auth.logout(request)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 '''    
 def create_snippet(request):
     if request.method == "POST":
