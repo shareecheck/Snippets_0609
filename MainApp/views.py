@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from MainApp.models import Snippet
 from django.core.exceptions import ObjectDoesNotExist
+from MainApp.forms import SnippetForm
 
 def index_page(request):
     context = {'pagename': 'PythonBin'}
@@ -10,7 +11,9 @@ def index_page(request):
 
 
 def add_snippet_page(request):
-    context = {'pagename': 'Добавление нового сниппета'}
+    form = SnippetForm()
+    context = {'pagename': 'Добавление нового сниппета',
+               'form': form}
     return render(request, 'pages/add_snippet.html', context)
 
 
@@ -29,5 +32,13 @@ def snippet_info_page(request, snippet_id):
         return render(request, 'pages/snippet_info.html', context)
     except ObjectDoesNotExist:
         return HttpResponseNotFound(f'Сниппет не найден')
+    
+def create_snippet(request):
+   if request.method == "POST":
+       form = SnippetForm(request.POST)
+       if form.is_valid():
+           form.save()
+           return redirect("list")
+       return render(request,'add_snippet.html',{'form': form})
 
     
