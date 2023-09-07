@@ -23,7 +23,10 @@ def add_snippet_page(request):
     if request.method == 'POST':
         form = SnippetForm(request.POST)
         if form.is_valid():
-            form.save()
+            snippet = form.save(commit=False)  # Создаем сниппет, но не сохраняем его в БД
+            if(request.user.id): # Если пользователь авторизован
+                snippet.user = request.user  # Устанавливаем значение внешнего ключа на текущего пользователя
+            snippet.save()  # Сохраняем сниппет в БД
             return redirect("list")
         return render(request,'pages/add_snippet.html',{'form': form})
     
@@ -56,13 +59,15 @@ def edit_snippet(request, snippet_id):
         snippet.lang = data_form['lang']
         snippet.creation_date = data_form['creation_date']
         snippet.code = data_form['code']
+        snippet.is_public = data_form['is_public']
         snippet.save()
         return redirect("list")
 
 
 
 def snippets_page(request):
-    snippets = Snippet.objects.all()
+    #snippets = Snippet.objects.all()
+    snippets = Snippet.objects.filter(is_public=True)
     context = {'pagename': 'Просмотр сниппетов',
             'snippets': snippets,
             'snippets_amount': len(snippets)}
@@ -94,7 +99,21 @@ def login(request):
 
 def logout(request):
     auth.logout(request)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    #return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect('index')
+
+def my_list(request):
+    user_id = request.user.id
+    if user_id:
+        snippets = Snippet.objects.filter(user_id=user_id)
+        context = {'snippets': snippets,
+                   'pagename': 'Мои сниппеты',
+                   'snippets_amount': len(snippets)}
+        return render(request, 'pages/my_snippets.html', context)
+    
+    else:
+        return redirect('index')
+
 '''    
 def create_snippet(request):
     if request.method == "POST":
