@@ -5,12 +5,14 @@ from MainApp.models import Snippet
 from django.core.exceptions import ObjectDoesNotExist
 from MainApp.forms import SnippetForm
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
+
 
 def index_page(request):
     context = {'pagename': 'PythonBin'}
     return render(request, 'pages/index.html', context)
 
-
+@login_required
 def add_snippet_page(request):
     #Хотим получить чистую форму для заполнения полей
     if request.method == 'GET':
@@ -59,7 +61,7 @@ def edit_snippet(request, snippet_id):
         snippet.lang = data_form['lang']
         snippet.creation_date = data_form['creation_date']
         snippet.code = data_form['code']
-        snippet.is_public = data_form['is_public']
+        snippet.is_public = data_form.get('public', False)
         snippet.save()
         return redirect("list")
 
@@ -104,17 +106,14 @@ def logout(request):
     #return redirect(request.META.get('HTTP_REFERER', '/'))
     return redirect('index')
 
-def my_list(request):
-    user_id = request.user.id
-    if user_id:
-        snippets = Snippet.objects.filter(user_id=user_id)
-        context = {'snippets': snippets,
-                   'pagename': 'Мои сниппеты',
-                   'snippets_amount': len(snippets)}
-        return render(request, 'pages/my_snippets.html', context)
-    
-    else:
-        return redirect('index')
+@login_required
+def my_snippets(request):
+    snippets = Snippet.objects.filter(user=request.user)
+    context = {'snippets': snippets,
+                'pagename': 'Мои сниппеты',
+                'snippets_amount': len(snippets)}
+    return render(request, 'pages/view_snippets.html', context)
+
 
 '''    
 def create_snippet(request):

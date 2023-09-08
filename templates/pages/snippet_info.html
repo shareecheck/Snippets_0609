@@ -24,7 +24,8 @@
                                 Дата создания:<input type="text" value="{{ snippet.creation_date }}" class="form-control">
                             </div>
                             <div class="col col-4">
-                                Тип сниппета (публичный/частный):<input name="is_public" input type="text" value="{{ snippet.is_public }}" class="form-control">
+                                Тип сниппета (публичный/частный):<input type="checkbox" name="is_public" value="True" 
+                                {% if snippet.is_public %} checked {% endif %}>
                             </div>
                         </div>
                         <hr>
@@ -44,16 +45,17 @@
 
                         <div class="row">
                             <div class="col col-8">
-                                Название: <input name="name" input type="text" value="{{ snippet.name }}" class="form-control">
+                                Название: <input name="name"  type="text" value="{{ snippet.name }}" class="form-control">
                             </div>
                             <div class="col col-8">
-                                Язык: <input name="lang" input type="text" value="{{ snippet.lang }}" class="form-control">
+                                Язык: <input name="lang"  type="text" value="{{ snippet.lang }}" class="form-control">
                             </div>
                             <div class="col col-4">
-                                Дата создания:<input name="creation_date" input type="text" value="{{ snippet.creation_date }}" class="form-control">
+                                Дата создания:<input name="creation_date"  type="text" value="{{ snippet.creation_date }}" class="form-control">
                             </div>
                             <div class="col col-4">
-                                Тип сниппета (публичный/частный):<input name="is_public" input type="text" value="{{ snippet.is_public }}" class="form-control">
+                                Тип сниппета (публичный/частный):<input type="checkbox" name="is_public" value="True" 
+                                {% if snippet.is_public %} checked {% endif %}>
                             </div>
                         </div>
                         <hr>
