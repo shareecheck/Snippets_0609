@@ -61,7 +61,7 @@ def edit_snippet(request, snippet_id):
         snippet.lang = data_form['lang']
         snippet.creation_date = data_form['creation_date']
         snippet.code = data_form['code']
-        snippet.is_public = data_form.get('public', False)
+        snippet.is_public = data_form.get('is_public', False)
         snippet.save()
         return redirect("list")
 
