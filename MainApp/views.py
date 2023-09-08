@@ -118,7 +118,7 @@ def my_snippets(request):
     return render(request, 'pages/view_snippets.html', context)
 
 
-@login_required
+
 def create_user(request):
     context = {'pagename': 'Регистрация пользователя'}
     #Хотим получить чистую форму для заполнения полей
