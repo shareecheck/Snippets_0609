@@ -35,11 +35,13 @@
                         <td scope="row">{{ snippet.id }}</td>
                         <td><a href="{% url 'snippet_info' snippet.id %}">{{ snippet.name }}</a>
 
+                            {% if request.user == snippet.user %}
                             <a href="{% url 'delete' snippet.id %}">
                                 <i style="color:red" class="fa-solid fa-trash"></i></a>
 
                             <a href="{% url 'edit' snippet.id %}">
                                 <i style="color:blue" class="fa-solid fa-pen-to-square"></i></a>
+                            {% endif %}
                         </td>
                             
                         <td>{{ snippet.creation_date }}</td>

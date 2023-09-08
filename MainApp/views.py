@@ -1,9 +1,9 @@
 from django.http import Http404
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from MainApp.models import Snippet
 from django.core.exceptions import ObjectDoesNotExist
-from MainApp.forms import SnippetForm
+from MainApp.forms import SnippetForm, UserRegistrationForm
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
@@ -31,17 +31,20 @@ def add_snippet_page(request):
             snippet.save()  # Сохраняем сниппет в БД
             return redirect("list")
         return render(request,'pages/add_snippet.html',{'form': form})
-    
+
+@login_required   
 def delete_snippet(request, snippet_id):
     try:
         snippet = Snippet.objects.get(id=snippet_id)
     except ObjectDoesNotExist:
         raise Http404
     else:
-        snippet.delete()
-        return redirect("list")
+        if snippet.user == request.user:
+            snippet.delete()
+            return redirect("list")
+        return HttpResponseForbidden('Others snippets')
     
-
+@login_required
 def edit_snippet(request, snippet_id):
     try:
         snippet = Snippet.objects.get(id=snippet_id)
@@ -72,7 +75,7 @@ def snippets_page(request):
     snippets = Snippet.objects.filter(is_public=True)
     context = {'pagename': 'Просмотр сниппетов',
             'snippets': snippets,
-            'snippets_amount': len(snippets)}
+            'snippets_amount': snippets.count()}
     return render(request, 'pages/view_snippets.html', context)
     
 
@@ -111,18 +114,25 @@ def my_snippets(request):
     snippets = Snippet.objects.filter(user=request.user)
     context = {'snippets': snippets,
                 'pagename': 'Мои сниппеты',
-                'snippets_amount': len(snippets)}
+                'snippets_amount': snippets.count()}
     return render(request, 'pages/view_snippets.html', context)
 
 
-'''    
-def create_snippet(request):
-    if request.method == "POST":
-        form = SnippetForm(request.POST)
+@login_required
+def create_user(request):
+    context = {'pagename': 'Регистрация пользователя'}
+    #Хотим получить чистую форму для заполнения полей
+    if request.method == 'GET':
+        form = UserRegistrationForm()
+        context['form']: form
+        return render(request, 'pages/registration.html', context)
+    
+    #Хотим сохранить пользователя
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            orm.save()
-            return redirect("list")
-        return render(request,'add_snippet.html',{'form': form})
-'''
-
+            form.save 
+            return redirect("index")
+        context['form'] = form
+        return render(request,'pages/registration.html', context)
     
