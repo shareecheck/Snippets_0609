@@ -24,7 +24,7 @@ def add_snippet_page(request):
         form = SnippetForm(request.POST)
         if form.is_valid():
             snippet = form.save(commit=False)  # Создаем сниппет, но не сохраняем его в БД
-            if(request.user.id): # Если пользователь авторизован
+            if request.user.is_authenticated: # Если пользователь авторизован
                 snippet.user = request.user  # Устанавливаем значение внешнего ключа на текущего пользователя
             snippet.save()  # Сохраняем сниппет в БД
             return redirect("list")
